@@ -23,7 +23,6 @@ module System.Posix.Syslog.UDP
     -- ** Re-exports from <http://hackage.haskell.org/package/hsyslog hsyslog>
     L.Priority (..)
   , L.Facility (..)
-  , L.PriorityMask (..)
     -- ** Newtypes for various String/Int values
     -- | Refer to
     -- <https://tools.ietf.org/html/rfc5424#section-6.2 RFC 5424 section 6.2>
@@ -67,7 +66,7 @@ module System.Posix.Syslog.UDP
 
 import Control.Exception (SomeException, catch)
 import Control.Monad (void)
-import Data.Bits ((.&.))
+import Data.Bits ((.|.))
 import Data.ByteString (ByteString)
 import Data.Monoid ((<>))
 import Data.Text (Text)
@@ -84,9 +83,11 @@ import qualified Network.Socket as S
 import qualified Network.Socket.ByteString as SB
 import qualified System.Posix.Process as P
 import qualified System.Posix.Syslog as L
+import System.Posix.Syslog.Facility (fromFacility)
+import System.Posix.Syslog.Priority (fromPriority)
 
 type Severity = L.Priority
-type SeverityMask = L.PriorityMask
+type SeverityMask = [L.Priority]
 
 type Protocol
   =  PriVal
@@ -197,7 +198,7 @@ defaultConfig = do
     processId <- getProcessId
     return SyslogConfig {..}
   where
-    severityMask = L.NoMask
+    severityMask = [minBound..maxBound]
     address = localhost
     protocol = rfc3164Protocol
 
@@ -369,12 +370,12 @@ maskedPriVal
   -> Severity
   -> Maybe PriVal
 maskedPriVal mask fac sev
-    | mask == L.NoMask = prival
     | masked = Nothing
     | otherwise = prival
   where
-    prival = Just . PriVal $ L.makePri fac sev
-    masked = L._LOG_MASK (L.fromPriority sev) .&. L.fromPriorityMask mask == 0
+    priority = fromFacility fac .|. fromPriority sev
+    prival = Just $ PriVal priority
+    masked = not $ sev `elem` mask
 
 -- internal functions
 
