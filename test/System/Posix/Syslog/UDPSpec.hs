@@ -10,17 +10,19 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
+  let upTo x = [minBound..x]
+      noMask = [minBound..maxBound]
   describe "maskedPriVal" $ do
     it "returns a Just if priorities remain after masking" $
-      let result = maskedPriVal (UpTo Debug) LOCAL4 Notice
+      let result = maskedPriVal (upTo Debug) Local4 Notice
       in result `shouldBe` Just (PriVal 165)
 
     it "returns Nothing if all priorities are masked" $
-      let result = maskedPriVal (UpTo Info) USER Debug
+      let result = maskedPriVal (upTo Info) User Debug
       in result `shouldBe` Nothing
 
   describe "rfc5424Packet" $ do
-    let (Just priVal) = maskedPriVal NoMask USER Debug
+    let (Just priVal) = maskedPriVal noMask User Debug
 
     it "uses the NILVALUE for Nothing values" $
       let
@@ -56,7 +58,7 @@ spec = do
 
   describe "rfc3164Packet" $ do
     let
-      (Just priVal) = maskedPriVal NoMask USER Debug
+      (Just priVal) = maskedPriVal noMask User Debug
       (Just time) = parseTimeM True defaultTimeLocale "%FT%X%QZ" "2003-10-11T22:14:15.003Z" :: Maybe UTCTime
 
     it "correctly formats the message" $
@@ -68,7 +70,7 @@ spec = do
 
   describe "rsyslogPacket" $ do
     let
-      (Just priVal) = maskedPriVal NoMask USER Debug
+      (Just priVal) = maskedPriVal noMask User Debug
       (Just time) = parseTimeM True defaultTimeLocale "%FT%X%QZ" "2003-10-11T22:14:15.003Z" :: Maybe UTCTime
 
     it "correctly formats the message" $

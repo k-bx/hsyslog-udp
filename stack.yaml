@@ -1,4 +1,4 @@
-resolver: lts-5.18
+resolver: lts-7.3
 flags: {}
 extra-package-dbs: []
 
@@ -6,4 +6,5 @@ packages:
   - '.'
 
 extra-deps:
-  - hsyslog-4
+  - hsyslog-5.0.1
+  - cabal-doctest-1.0.3
