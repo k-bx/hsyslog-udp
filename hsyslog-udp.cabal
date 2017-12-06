@@ -8,8 +8,8 @@ homepage:               https://github.com/ThoughtLeadr/hsyslog-udp
 bug-reports:            https://github.com/ThoughtLeadr/hsyslog-udp/issues
 license:                BSD3
 license-file:           LICENSE
-author:                 Jon Childress
-maintainer:             jon@childr.es
+author:                 Jon Childress <jon@childr.es>
+maintainer:             Kostiantyn Rybnikov <konstantine@thoughtleadr.com>
 category:               System
 build-type:             Simple
 extra-source-files:     README.md
