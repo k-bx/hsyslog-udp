@@ -149,6 +149,7 @@ initSyslog :: SyslogConfig -> IO SyslogFn
 initSyslog config = S.withSocketsDo $ do
     socket <- S.socket (S.addrFamily $ address config) S.Datagram udpProtoNum
     let send = flip (SB.sendTo socket) (S.addrAddress $ address config)
+        safely f = catch (void f) (onException config)
 
     return $ \facility severity message ->
       case maskedPriVal (severityMask config) facility severity of
@@ -186,6 +187,8 @@ data SyslogConfig = SyslogConfig
   , protocol :: Protocol
     -- ^ protocol for formatting the message, such as 'rfc5424Protocol' or
     -- 'rfc3164Protocol'
+  , onException :: SomeException -> IO ()
+    -- ^ custom exception handler
   }
 
 -- | A convenient default config for connecting to 'localhost'. Provided for
@@ -201,6 +204,7 @@ defaultConfig = do
     severityMask = [minBound..maxBound]
     address = localhost
     protocol = rfc3164Protocol
+    onException = const $ return ()
 
 -- | The default IPv4 address/port for syslog on a local machine. Provided for
 -- development/testing purposes.
@@ -409,9 +413,6 @@ rfc3164Variant timeFormat priVal time hostName' appName' processId' message =
   where
     mkHost (HostName x) = notEmpty x
     mkTag (AppName name) (ProcessID procId) = name <> "[" <> procId <> "]:"
-
-safely :: IO a -> IO ()
-safely f = catch (void f) (const $ return () :: SomeException -> IO ())
 
 sp :: ByteString -> ByteString -> ByteString
 sp b1 b2 = b1 <> " " <> b2
