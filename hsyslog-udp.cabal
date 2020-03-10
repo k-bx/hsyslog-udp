@@ -19,6 +19,11 @@ Source-Repository head
   type:                 git
   location:             git://github.com/k-bx/hsyslog-udp.git
 
+flag network--GE-3_0_0
+  description: [network](http://hackage.haskell.org/package/network) ≥ 3.0.0
+  default: True
+  manual: False
+
 library
   default-language:     Haskell2010
   hs-source-dirs:       src
@@ -28,10 +33,14 @@ library
   Build-Depends:        base >= 3 && < 5
                       , bytestring < 0.11
                       , hsyslog >= 5 && < 6
-                      , network < 2.9
                       , text < 1.3
-                      , time < 1.9
+                      , time < 1.10
                       , unix < 2.8
+  if flag(network--GE-3_0_0)
+    build-depends: network-bsd >= 2.8.1 && <2.9,
+                   network >= 3.0 && <3.2
+  else
+    build-depends: network >= 2.6.3.1 && <2.9
 
 test-suite specs
   default-language:     Haskell2010
@@ -40,7 +49,7 @@ test-suite specs
   type:                 exitcode-stdio-1.0
   other-modules:        System.Posix.Syslog.UDPSpec
 
-  Build-Depends:        base >= 3 && < 5
-                      , hspec < 2.6
+  Build-Depends:        base
+                      , hspec
                       , hsyslog-udp
-                      , time < 1.9
+                      , time

@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -68,7 +69,9 @@ import Control.Exception (SomeException, catch)
 import Control.Monad (void)
 import Data.Bits ((.|.))
 import Data.ByteString (ByteString)
+#if __GLASGOW_HASKELL__ < 808
 import Data.Monoid ((<>))
+#endif
 import Data.Text (Text)
 import Data.Time.Clock (UTCTime, getCurrentTime)
 import Data.Time.Format (FormatTime, formatTime, defaultTimeLocale)
